@@ -42,8 +42,7 @@ jobs:
           docker exec my-ocaml-container bash -c '
             cd /workspace &&
             eval $(opam env) &&
-            opam install -y . &&
-            which benchmark-system'
+            opam install -y .'
       
 
       # - name: Run a privileged OCaml container
