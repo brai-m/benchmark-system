@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: See if privileged Docker works 
+        run: |
+          docker run --privileged ubuntu echo "Hello from privileged Docker"
+
       - name: Checkout tree
         uses: actions/checkout@v4
 
@@ -27,3 +31,4 @@ jobs:
 
       - name: Test bwrap
         run: bwrap --dev-bind / / echo "bubblewrap is working!"
+
