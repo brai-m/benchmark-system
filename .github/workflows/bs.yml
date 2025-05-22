@@ -42,7 +42,7 @@ jobs:
           docker exec my-ocaml-container bash -c '
             cd /workspace &&
             eval $(opam env) &&
-            opam install -y .
+            opam install -y . &&
             which benchmark-system'
       
 
