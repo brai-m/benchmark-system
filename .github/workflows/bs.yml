@@ -45,6 +45,7 @@ jobs:
       - name: See if the ssh works
         run: |
           docker exec my-ocaml-container bash -c '
+            cd /workspace &&
             git config user.name "CI Bot" &&
             git config user.email "ci@example.com" &&
             ssh -T git@github.com'
