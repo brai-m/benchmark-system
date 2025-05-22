@@ -48,12 +48,17 @@ jobs:
             git clone git@github.com:brai-m/benchmark-data.git &&
             git config --global user.name "CI Bot" &&
             git config --global user.email "ci@example.com" &&
-            pwd &&
-            ls benchmark-data'
-                  
+            pwd'
+
       - name: Check if opam is available
         run: docker exec my-ocaml-container opam --version
-          
+
+      - name: run benchmarks
+        run: |
+          docker exec my-ocaml-container bash -c '
+            ls &&
+            tactician-benchmark -help'
+
       # - name: Try to install
       #   run: |
       #     docker exec my-ocaml-container bash -c '
