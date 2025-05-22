@@ -7,20 +7,37 @@ on:
 permissions: read-all
 
 jobs:
-  build:
+  bwrap-test:
     runs-on: ubuntu-latest
+    container:
+      image: ocaml/opam:ubuntu-ocaml-4.11
+      options: --privileged
 
     steps:
-      - name: See if privileged Docker works 
+      - name: Update apt and install bubblewrap
         run: |
-          docker run --privileged ubuntu echo "Hello from privileged Docker"
+          sudo apt update
+          sudo apt install -y bubblewrap
 
-      - name: Test bubblewrap in privileged container
+      - name: Try bubblewrap
         run: |
-          docker run --rm --privileged ubuntu bash -c '
-            apt update && apt install -y bubblewrap &&
-            sysctl -w kernel.unprivileged_userns_clone=1 &&
-            bwrap --dev-bind / / echo "Bubblewrap works!"'
+          sysctl -w kernel.unprivileged_userns_clone=1 || true
+          bwrap --dev-bind / / echo "✅ Bubblewrap works!"
+
+  # build:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: See if privileged Docker works 
+  #       run: |
+  #         docker run --privileged ubuntu echo "Hello from privileged Docker"
+
+  #     - name: Test bubblewrap in privileged container
+  #       run: |
+  #         docker run --rm --privileged ubuntu bash -c '
+  #           apt update && apt install -y bubblewrap &&
+  #           sysctl -w kernel.unprivileged_userns_clone=1 &&
+  #           bwrap --dev-bind / / echo "Bubblewrap works!"'
         
       # - name: Checkout tree
       #   uses: actions/checkout@v4
