@@ -29,7 +29,7 @@ jobs:
         run: |
           docker exec my-ocaml-container bash -c '
             apt update &&
-            apt install -y bubblewrap &&
+            apt install -y bubblewrap libkrb5-dev &&
             sysctl -w kernel.unprivileged_userns_clone=1 &&
             echo "Trying bubblewrap..." &&
             bwrap --dev-bind / / echo "Bubblewrap works!"'        
