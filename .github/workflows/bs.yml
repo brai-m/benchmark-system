@@ -9,20 +9,30 @@ permissions: read-all
 jobs:
   bwrap-test:
     runs-on: ubuntu-latest
-    container:
-      image: ocaml/opam:ubuntu-ocaml-4.11
-      options: --privileged
 
     steps:
-      - name: Update apt and install bubblewrap
+      - name: Run a privileged OCaml container
         run: |
-          sudo apt update
-          sudo apt install -y bubblewrap
+          docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
+            apt update &&
+            apt install -y bubblewrap &&
+            sysctl -w kernel.unprivileged_userns_clone=1 || true &&
+            echo "Trying bubblewrap..." &&
+            bwrap --dev-bind / / echo "Bubblewrap works!"'
+    # container:
+    #   image: ocaml/opam:ubuntu-ocaml-4.11
+    #   options: --privileged
 
-      - name: Try bubblewrap
-        run: |
-          sysctl -w kernel.unprivileged_userns_clone=1 || true
-          bwrap --dev-bind / / echo "✅ Bubblewrap works!"
+    # steps:
+    #   - name: Update apt and install bubblewrap
+    #     run: |
+    #       sudo apt update
+    #       sudo apt install -y bubblewrap
+
+    #   - name: Try bubblewrap
+    #     run: |
+    #       sysctl -w kernel.unprivileged_userns_clone=1 || true
+    #       bwrap --dev-bind / / echo "✅ Bubblewrap works!"
 
   # build:
   #   runs-on: ubuntu-latest
