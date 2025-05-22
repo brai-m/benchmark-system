@@ -13,7 +13,8 @@ jobs:
     steps:
       - name: Start privileged container and keep it
         run: |
-          docker run -d --privileged --user root --name my-ocaml-container -v "$GITHUB_WORKSPACE:/workspace" ocaml/opam:ubuntu-ocaml-4.11 sleep infinity
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          docker run -d --privileged --user root --name my-ocaml-container -v "${GITHUB_WORKSPACE}:/workspace" ocaml/opam:ubuntu-ocaml-4.11 sleep infinity
 
       - name: Let me see what's inside
         run: docker exec my-ocaml-container ls /workspace
