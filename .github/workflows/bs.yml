@@ -11,25 +11,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run a privileged OCaml container
+      - name: Start privileged container and keep it
         run: |
-          docker run --rm --privileged --user root ocaml/opam:ubuntu-ocaml-4.11 bash -c '
+          docker run -d --privileged --user root --name my-ocaml-container ocaml/opam:ubuntu-ocaml-4.11 sleep infinity
+    
+      - name: Install bwrap inside the running container
+        run: |
+          docker exec my-ocaml-container bash -c '
             apt update &&
-            apt install -y bubblewrap &&
+            apt install -y bubblewrap'
             sysctl -w kernel.unprivileged_userns_clone=1 &&
             echo "Trying bubblewrap..." &&
-            bwrap --dev-bind / / echo "Bubblewrap works!"'
+            bwrap --dev-bind / / echo "Bubblewrap works!"'        
 
-      - name: See if OPAM is available
-        run: |
-          opam switch
-          # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 id
-          # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
-          #   apt update &&
-          #   apt install -y bubblewrap &&
-          #   sysctl -w kernel.unprivileged_userns_clone=1 || true &&
-          #   echo "Trying bubblewrap..." &&
-          #   bwrap --dev-bind / / echo "Bubblewrap works!"'
+      - name: Check if opam is available
+        run: docker exec my-ocaml-container opam --version
+          
+
+
+      # - name: Run a privileged OCaml container
+      #   run: |
+      #     docker run --rm --privileged --user root ocaml/opam:ubuntu-ocaml-4.11 bash -c '
+      #       apt update &&
+      #       apt install -y bubblewrap &&
+      #       sysctl -w kernel.unprivileged_userns_clone=1 &&
+      #       echo "Trying bubblewrap..." &&
+      #       bwrap --dev-bind / / echo "Bubblewrap works!"'
+
+      # - name: See if OPAM is available
+      #   run: |
+      #     opam switch
+      #     # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 id
+      #     # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
+      #     #   apt update &&
+      #     #   apt install -y bubblewrap &&
+      #     #   sysctl -w kernel.unprivileged_userns_clone=1 || true &&
+      #     #   echo "Trying bubblewrap..." &&
+      #     #   bwrap --dev-bind / / echo "Bubblewrap works!"'
     # container:
     #   image: ocaml/opam:ubuntu-ocaml-4.11
     #   options: --privileged
