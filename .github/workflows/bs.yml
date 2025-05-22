@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Start privileged container and keep it
         run: |
-          docker run -d --privileged --user root --name my-ocaml-container ocaml/opam:ubuntu-ocaml-4.11 sleep infinity
+          docker run -d --privileged --user root --name my-ocaml-container ocaml/opam:ubuntu-ocaml-4.12 sleep infinity
 
       - name: Clone this repo inside container
         run: |
@@ -42,7 +42,8 @@ jobs:
           docker exec my-ocaml-container bash -c '
             cd /workspace &&
             eval $(opam env) &&
-            opam install -y .'
+            opam install -y .
+            which benchmark-system'
       
 
       # - name: Run a privileged OCaml container
