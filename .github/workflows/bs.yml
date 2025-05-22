@@ -1,4 +1,4 @@
-name: Builds, tests & co
+name: Test benchmarks
 
 on:
   - push
@@ -7,7 +7,7 @@ on:
 permissions: read-all
 
 jobs:
-  bwrap-test:
+  benchmark-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       - name: Let me see what's inside
         run: docker exec my-ocaml-container ls benchmark-system
       
-      - name: Install dependencies inside the running container
+      - name: Install dependencies
         run: |
           docker exec my-ocaml-container bash -c '
             apt update &&
@@ -34,7 +34,7 @@ jobs:
             echo "Trying bubblewrap..." &&
             bwrap --dev-bind / / echo "Bubblewrap works!"'        
 
-      - name: Copy SSH key into container
+      - name: Set up SSH
         run: |
           docker exec my-ocaml-container bash -c '
             mkdir -p /root/.ssh &&
@@ -42,7 +42,7 @@ jobs:
             chmod 600 /root/.ssh/id_ed25519 &&
             echo -e "Host github.com\n  StrictHostKeyChecking no\n  IdentityFile ~/.ssh/id_ed25519\n  User git" > /root/.ssh/config'
 
-      - name: See if the ssh works
+      - name: Clone benchmark-data
         run: |
           docker exec my-ocaml-container bash -c '
             git clone git@github.com:brai-m/benchmark-data.git &&
@@ -50,10 +50,7 @@ jobs:
             git config --global user.email "ci@example.com" &&
             pwd'
 
-      - name: Check if opam is available
-        run: docker exec my-ocaml-container opam --version
-
-      - name: Try to install
+      - name: Install benchmark-system
         run: |
           docker exec my-ocaml-container bash -c '
             ls &&
@@ -61,7 +58,7 @@ jobs:
             eval $(opam env) &&
             opam install -y .'
       
-      - name: Verify installation
+      - name: Start benchmarks
         run: |
           docker exec my-ocaml-container bash -c '
             eval $(opam env) &&
@@ -70,83 +67,10 @@ jobs:
               -compile-allocator ./benchmark-system/local/compile_allocator \
               -bench-allocator ./benchmark-system/local/bench_allocator \
               -max-requests 16 \
-              -max-running 2 \
+              -max-running 4 \
               -delay-benchmark \
               -benchmark-target coq-tactician \
               -benchmark-repo git+ssh://git@github.com/brai-m/coq-tactician.git \
               -benchmark-commit 00e096bc7f68db29035e226136aa5421ea3dd9b8 \
               -benchmark-time 40 \
               coq-tactician-stdlib'
-
-      # - name: Run a privileged OCaml container
-      #   run: |
-      #     docker run --rm --privileged --user root ocaml/opam:ubuntu-ocaml-4.11 bash -c '
-      #       apt update &&
-      #       apt install -y bubblewrap &&
-      #       sysctl -w kernel.unprivileged_userns_clone=1 &&
-      #       echo "Trying bubblewrap..." &&
-      #       bwrap --dev-bind / / echo "Bubblewrap works!"'
-
-      # - name: See if OPAM is available
-      #   run: |
-      #     opam switch
-      #     # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 id
-      #     # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
-      #     #   apt update &&
-      #     #   apt install -y bubblewrap &&
-      #     #   sysctl -w kernel.unprivileged_userns_clone=1 || true &&
-      #     #   echo "Trying bubblewrap..." &&
-      #     #   bwrap --dev-bind / / echo "Bubblewrap works!"'
-    # container:
-    #   image: ocaml/opam:ubuntu-ocaml-4.11
-    #   options: --privileged
-
-    # steps:
-    #   - name: Update apt and install bubblewrap
-    #     run: |
-    #       sudo apt update
-    #       sudo apt install -y bubblewrap
-
-    #   - name: Try bubblewrap
-    #     run: |
-    #       sysctl -w kernel.unprivileged_userns_clone=1 || true
-    #       bwrap --dev-bind / / echo "✅ Bubblewrap works!"
-
-  # build:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: See if privileged Docker works 
-  #       run: |
-  #         docker run --privileged ubuntu echo "Hello from privileged Docker"
-
-      # - name: Test bubblewrap in privileged container
-      #   run: |
-      #     docker run --rm --privileged ubuntu bash -c '
-      #       apt update && apt install -y bubblewrap &&
-      #       sysctl -w kernel.unprivileged_userns_clone=1 &&
-      #       bwrap --dev-bind / / echo "Bubblewrap works!"'
-        
-      # - name: Checkout tree
-      #   uses: actions/checkout@v4
-
-      # - name: Set-up OCaml (4.11)
-      #   uses: ocaml/setup-ocaml@v3
-      #   with:
-      #     ocaml-compiler: 4.11
-
-      # - name: Add Coq OPAM repositories
-      #   run: |
-      #     opam repo add coq-released https://coq.inria.fr/opam/released
-      #     opam repo add coq-core-dev https://coq.inria.fr/opam/core-dev
-      #     opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
-
-      # - name: Test bwrap
-      #   run: bwrap --dev-bind / / echo "bubblewrap is working!"
-
-      # - name: what's going on
-      #   run: |
-      #     docker exec my-ocaml-container bash -c '
-      #       echo "whoami: $(whoami)"
-      #       echo "mount info:"; mount | grep workspace || true
-      #       echo "listing:"; ls -la /workspace'
