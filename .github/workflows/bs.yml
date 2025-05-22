@@ -20,6 +20,9 @@ jobs:
             echo "Trying bubblewrap..." &&
             bwrap --dev-bind / / echo "Bubblewrap works!"'
 
+      - name: See if OPAM is available
+        run: |
+          opam switch
           # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 id
           # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
           #   apt update &&
