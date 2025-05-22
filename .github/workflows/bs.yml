@@ -23,7 +23,7 @@ jobs:
             git checkout ${{ github.ref }}'
         
       - name: Let me see what's inside
-        run: docker exec my-ocaml-container ls /workspace
+        run: docker exec my-ocaml-container ls benchmark-system
       
       - name: Install dependencies inside the running container
         run: |
