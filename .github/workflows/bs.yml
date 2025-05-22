@@ -20,7 +20,7 @@ jobs:
           docker run --rm --privileged ubuntu bash -c '
             apt update && apt install -y bubblewrap &&
             sysctl -w kernel.unprivileged_userns_clone=1 &&
-            bwrap --ro-bind / / echo "Bubblewrap works!"'
+            bwrap --dev-bind / / echo "Bubblewrap works!"'
         
       # - name: Checkout tree
       #   uses: actions/checkout@v4
