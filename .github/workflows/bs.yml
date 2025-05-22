@@ -37,7 +37,13 @@ jobs:
       - name: Check if opam is available
         run: docker exec my-ocaml-container opam --version
           
-
+      - name: Try to install
+        run: |
+          docker exec my-ocaml-container bash -c '
+            cd /workspace &&
+            eval $(opam env) &&
+            opam install -y .'
+      
 
       # - name: Run a privileged OCaml container
       #   run: |
