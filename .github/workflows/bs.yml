@@ -13,12 +13,13 @@ jobs:
     steps:
       - name: Run a privileged OCaml container
         run: |
-          docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
-            apt update &&
-            apt install -y bubblewrap &&
-            sysctl -w kernel.unprivileged_userns_clone=1 || true &&
-            echo "Trying bubblewrap..." &&
-            bwrap --dev-bind / / echo "Bubblewrap works!"'
+          docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 id
+          # docker run --rm --privileged ocaml/opam:ubuntu-ocaml-4.11 bash -c '
+          #   apt update &&
+          #   apt install -y bubblewrap &&
+          #   sysctl -w kernel.unprivileged_userns_clone=1 || true &&
+          #   echo "Trying bubblewrap..." &&
+          #   bwrap --dev-bind / / echo "Bubblewrap works!"'
     # container:
     #   image: ocaml/opam:ubuntu-ocaml-4.11
     #   options: --privileged
@@ -42,12 +43,12 @@ jobs:
   #       run: |
   #         docker run --privileged ubuntu echo "Hello from privileged Docker"
 
-  #     - name: Test bubblewrap in privileged container
-  #       run: |
-  #         docker run --rm --privileged ubuntu bash -c '
-  #           apt update && apt install -y bubblewrap &&
-  #           sysctl -w kernel.unprivileged_userns_clone=1 &&
-  #           bwrap --dev-bind / / echo "Bubblewrap works!"'
+      - name: Test bubblewrap in privileged container
+        run: |
+          docker run --rm --privileged ubuntu bash -c '
+            apt update && apt install -y bubblewrap &&
+            sysctl -w kernel.unprivileged_userns_clone=1 &&
+            bwrap --dev-bind / / echo "Bubblewrap works!"'
         
       # - name: Checkout tree
       #   uses: actions/checkout@v4
