@@ -41,23 +41,32 @@ jobs:
             echo "${{ secrets.TARGET_REPO_SSH_KEY }}" > /root/.ssh/id_ed25519 &&
             chmod 600 /root/.ssh/id_ed25519 &&
             echo -e "Host github.com\n  StrictHostKeyChecking no\n  IdentityFile ~/.ssh/id_ed25519\n  User git" > /root/.ssh/config'
-      
+
+      - name: See if the ssh works
+        run: |
+          docker exec my-ocaml-container bash -c '
+            git config user.name "CI Bot" &&
+            git config user.email "ci@example.com" &&
+            ssh -T git@github.com'
+                  
       - name: Check if opam is available
         run: docker exec my-ocaml-container opam --version
           
-      - name: Try to install
-        run: |
-          docker exec my-ocaml-container bash -c '
-            cd /workspace &&
-            eval $(opam env) &&
-            opam install -y .'
+      # - name: Try to install
+      #   run: |
+      #     docker exec my-ocaml-container bash -c '
+      #       cd /workspace &&
+      #       eval $(opam env) &&
+      #       opam install -y .'
       
-      - name: Verify installation
-        run: |
-          docker exec my-ocaml-container bash -c '
-            cd /workspace &&
-            eval $(opam env) &&
-            which tactician-benchmark'
+      # - name: Verify installation
+      #   run: |
+      #     docker exec my-ocaml-container bash -c '
+      #       cd /workspace &&
+      #       eval $(opam env) &&
+      #       which tactician-benchmark'
+
+
       # - name: Run a privileged OCaml container
       #   run: |
       #     docker run --rm --privileged --user root ocaml/opam:ubuntu-ocaml-4.11 bash -c '
