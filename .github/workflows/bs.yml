@@ -13,17 +13,24 @@ jobs:
     steps:
       - name: Start privileged container and keep it
         run: |
-          docker run -d --privileged --user root --name my-ocaml-container -v "${{ github.workspace }}:/workspace" ocaml/opam:ubuntu-ocaml-4.11 sleep infinity
+          docker run -d --privileged --user root --name my-ocaml-container ocaml/opam:ubuntu-ocaml-4.11 sleep infinity
 
-      - name: Let me see what's inside
-        run: docker exec my-ocaml-container ls /workspace
-
-      - name: what's going on
+      - name: Clone this repo inside container
         run: |
           docker exec my-ocaml-container bash -c '
-            echo "whoami: $(whoami)"
-            echo "mount info:"; mount | grep workspace || true
-            echo "listing:"; ls -la /workspace'
+            git clone https://github.com/${{ github.repository }} /workspace &&
+            cd /workspace &&
+            git checkout ${{ github.ref }}'
+        
+      # - name: Let me see what's inside
+      #   run: docker exec my-ocaml-container ls /workspace
+
+      # - name: what's going on
+      #   run: |
+      #     docker exec my-ocaml-container bash -c '
+      #       echo "whoami: $(whoami)"
+      #       echo "mount info:"; mount | grep workspace || true
+      #       echo "listing:"; ls -la /workspace'
       
       - name: Install bwrap inside the running container
         run: |
