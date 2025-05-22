@@ -15,20 +15,27 @@ jobs:
         run: |
           docker run --privileged ubuntu echo "Hello from privileged Docker"
 
-      - name: Checkout tree
-        uses: actions/checkout@v4
-
-      - name: Set-up OCaml (4.11)
-        uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: 4.11
-
-      - name: Add Coq OPAM repositories
+      - name: Test bubblewrap in privileged container
         run: |
-          opam repo add coq-released https://coq.inria.fr/opam/released
-          opam repo add coq-core-dev https://coq.inria.fr/opam/core-dev
-          opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
+          docker run --rm --privileged ubuntu bash -c '
+            apt update && apt install -y bubblewrap &&
+            sysctl -w kernel.unprivileged_userns_clone=1 &&
+            bwrap --ro-bind / / echo "Bubblewrap works!"'
+        
+      # - name: Checkout tree
+      #   uses: actions/checkout@v4
 
-      - name: Test bwrap
-        run: bwrap --dev-bind / / echo "bubblewrap is working!"
+      # - name: Set-up OCaml (4.11)
+      #   uses: ocaml/setup-ocaml@v3
+      #   with:
+      #     ocaml-compiler: 4.11
+
+      # - name: Add Coq OPAM repositories
+      #   run: |
+      #     opam repo add coq-released https://coq.inria.fr/opam/released
+      #     opam repo add coq-core-dev https://coq.inria.fr/opam/core-dev
+      #     opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
+
+      # - name: Test bwrap
+      #   run: bwrap --dev-bind / / echo "bubblewrap is working!"
 
