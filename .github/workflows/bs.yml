@@ -45,10 +45,10 @@ jobs:
       - name: See if the ssh works
         run: |
           docker exec my-ocaml-container bash -c '
-            cd /workspace &&
-            git config user.name "CI Bot" &&
-            git config user.email "ci@example.com" &&
-            ssh -T git@github.com'
+            git clone git@github.com:brai-m/benchmark-data.git &&
+            git config --global user.name "CI Bot" &&
+            git config --global user.email "ci@example.com" &&
+            ls /benchmark-data'
                   
       - name: Check if opam is available
         run: docker exec my-ocaml-container opam --version
