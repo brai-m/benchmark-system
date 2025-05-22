@@ -53,26 +53,19 @@ jobs:
       - name: Check if opam is available
         run: docker exec my-ocaml-container opam --version
 
-      - name: run benchmarks
+      - name: Try to install
         run: |
           docker exec my-ocaml-container bash -c '
             ls &&
-            tactician-benchmark -help'
-
-      # - name: Try to install
-      #   run: |
-      #     docker exec my-ocaml-container bash -c '
-      #       cd /workspace &&
-      #       eval $(opam env) &&
-      #       opam install -y .'
+            cd benchmark-system &&
+            eval $(opam env) &&
+            opam install -y .'
       
-      # - name: Verify installation
-      #   run: |
-      #     docker exec my-ocaml-container bash -c '
-      #       cd /workspace &&
-      #       eval $(opam env) &&
-      #       which tactician-benchmark'
-
+      - name: Verify installation
+        run: |
+          docker exec my-ocaml-container bash -c '
+            eval $(opam env) &&
+            tactician-benchmark -help'
 
       # - name: Run a privileged OCaml container
       #   run: |
