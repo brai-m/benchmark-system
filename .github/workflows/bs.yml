@@ -18,8 +18,8 @@ jobs:
       - name: Clone this repo inside container
         run: |
           docker exec my-ocaml-container bash -c '
-            git clone https://github.com/${{ github.repository }} /workspace &&
-            cd /workspace &&
+            git clone https://github.com/${{ github.repository }} benchmark-system &&
+            cd benchmark-system &&
             git checkout ${{ github.ref }}'
         
       - name: Let me see what's inside
@@ -48,7 +48,8 @@ jobs:
             git clone git@github.com:brai-m/benchmark-data.git &&
             git config --global user.name "CI Bot" &&
             git config --global user.email "ci@example.com" &&
-            ls'
+            pwd &&
+            ls benchmark-data'
                   
       - name: Check if opam is available
         run: docker exec my-ocaml-container opam --version
